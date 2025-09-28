@@ -2,6 +2,8 @@ name: Create Release
 
 on:
   workflow_dispatch:
+  repository_dispatch:
+    types: [deps-update]
 
 jobs:
   create-release:
