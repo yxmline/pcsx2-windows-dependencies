@@ -29,7 +29,7 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        $RELEASE=latest-windows-dependencies
+        $RELEASE="latest-windows-dependencies"
         $REPO = "PCSX2/pcsx2-windows-dependencies"
 
         gh release delete $RELEASE --cleanup-tag --yes --repo $REPO || true
