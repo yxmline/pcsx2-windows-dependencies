@@ -29,16 +29,24 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        RELEASE=latest-windows-dependencies
-        gh release delete $RELEASE --cleanup-tag --yes --repo PCSX2/pcsx2-windows-dependencies || true
+        $RELEASE=latest-windows-dependencies
+        $REPO = "PCSX2/pcsx2-windows-dependencies"
+
+        gh release delete $RELEASE --cleanup-tag --yes --repo $REPO || true
 
         # Workaround for https://github.com/cli/cli/issues/8458
-        # Thank you @soerenkoehler for the following 'fix'
-        printf "waiting for tag to be deleted\n"
-        while git fetch --tags --prune-tags; git tag -l | grep $RELEASE; do
-          sleep 10;
-          printf "still waiting...\n"
-        done
+        Write-Host "waiting for tag to be deleted"
 
-        gh release create $RELEASE --latest --title "Latest Dependencies Build" --repo PCSX2/pcsx2-windows-dependencies
-        gh release upload $RELEASE ./pcsx2-windows-dependencies.7z --repo PCSX2/pcsx2-windows-dependencies
+        while ($true) {
+            $result = gh api repos/$REPO/git/ref/tags/$RELEASE 2>$null
+
+            if (-not $?) {
+                break
+            }
+
+            Start-Sleep -Seconds 10
+            Write-Host "still waiting..."
+        }
+
+        gh release create $RELEASE --latest --title "Latest Dependencies Build" --repo $REPO
+        gh release upload $RELEASE ./pcsx2-windows-dependencies.7z --repo $REPO
